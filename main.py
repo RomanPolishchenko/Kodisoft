@@ -1,6 +1,7 @@
 from functions import *
 from classes import *
 import datetime
+from copy import deepcopy
 
 
 def input_apps(file_path):
@@ -45,6 +46,10 @@ def input_orders(file_path):
 
 
 def input_time():
+    """
+    Input and format time or use current time.
+    :return: <datetime>
+    """
     _time = input('Enter time in format "yyyy-mm-dd hh:mm:ss.ms" or 0 if you want to use current time: ')
     if _time is '0':
         _time = datetime.datetime.utcnow().astimezone()
@@ -55,21 +60,37 @@ def input_time():
 
 # @benchmark
 def parse_apps(app_list):
+    """
+    Parsing and looking for unique apps.
+    Takes list of all apps. Returns dict {key=AppName: value: App object} of unique apps.
+    :param app_list: <list>
+    :return: <dict>
+    """
     _seen = []
     _apps = {}
     for _app in app_list:
         if _app['AppId'] not in _seen:
-            _apps[_app['AppId']] = App(datetime.timedelta(0, 0, 0), 0, 0)
+            _apps[_app['AppId']] = App(datetime.timedelta(0, 0, 0), 0)
             _seen.append(_app['AppId'])
     return _apps
 
 
 def closest_h(_time):
+    """
+    Checks if _time is in the closest hour from CURRENT_TIME.
+    :param _time: <datetime>
+    :return: <bool>
+    """
     global HOUR, CURRENT_TIME
     return HOUR.seconds * 1/6 <= (_time - CURRENT_TIME).seconds <= HOUR.seconds
 
 
 def closest_2h(_time):
+    """
+    Checks if _time is in the closest 2 hours from CURRENT_TIME.
+    :param _time: <datetime>
+    :return: <bool>
+    """
     global HOUR, CURRENT_TIME
     return HOUR.seconds < (_time - CURRENT_TIME).seconds <= 2 * HOUR.seconds
 
@@ -92,9 +113,9 @@ if __name__ == '__main__':
     # look for all unique apps
     unique_apps = parse_apps(apps)
     # add them all to top-list
-    top_apps_h = unique_apps.copy()
-    top_apps_2h = unique_apps.copy()
-    top_apps_d = unique_apps.copy()
+    top_apps_h = deepcopy(unique_apps)
+    top_apps_2h = deepcopy(unique_apps)
+    top_apps_d = deepcopy(unique_apps)
 
     for app in apps:
         app_name = app['AppId']
@@ -105,7 +126,7 @@ if __name__ == '__main__':
         if start_time.isoweekday() != CURRENT_TIME.isoweekday():
             continue
         app_session = links.get(app_id)
-        if app_session is None:
+        if app_session is None or orders.get(app_session) is None:
             continue
         for order in orders.get(app_session):
 
@@ -115,15 +136,19 @@ if __name__ == '__main__':
                 if closest_h(order.time):  # if the order is made in closest hour
                     top_apps_h[app_name].total_time += app_duration
                     top_apps_h[app_name].total_revenue += current_revenue
+                    top_apps_2h[app_name].total_time += app_duration
+                    top_apps_2h[app_name].total_revenue += current_revenue
                 elif closest_2h(order.time):  # if the order is made in 2 closest hours
                     top_apps_2h[app_name].total_time += app_duration
-                    top_apps_h[app_name].total_revenue += current_revenue
+                    top_apps_2h[app_name].total_revenue += current_revenue
                 top_apps_d[app_name].total_time += app_duration  # anyway it is made in closest day
-                top_apps_h[app_name].total_revenue += current_revenue
+                top_apps_d[app_name].total_revenue += current_revenue
 
-    map(lambda x: x.calc_eff, top_apps_d)
-    map(lambda x: x.calc_eff, top_apps_h)
-    map(lambda x: x.calc_eff, top_apps_2h)
+    # calculate their efficiency
+    calc_efficiency(top_apps_h)
+    calc_efficiency(top_apps_2h)
+    calc_efficiency(top_apps_d)
+
     print('top_apps_h: ', top_apps_h)
     print('top_apps_2h: ', top_apps_2h)
     print('top_apps_d: ', top_apps_d)

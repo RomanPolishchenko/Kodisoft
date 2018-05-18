@@ -49,12 +49,24 @@ def benchmark(f):
     return _benchmark
 
 
+def calc_efficiency(apps):
+    """
+    Calculates efficiency for each app in 'apps'
+    :param apps: list of apps
+    :return: None
+    """
+    for app in apps.values():
+        app.calc_eff()
+
+
 if __name__ == '__main__':
-    t1 = time_fs('2018-02-25 10:51:21.433')
+    t1 = time_fs('2018-02-01T13:08:21.3375025Z')
+    t2 = time_fs('2018-02-01 13:08:21.337')
     print(t1)
-    t1 = t1.astimezone()
-    print(t1)
-    # t2 = time_fs('2018-02-01T12:19:39.6337006Z')
-    # print(t2 - t1)
-    print(id_to_lower('A2C4B1AD-CE00-469F-9DDE-89AA2A56014B'))
+    print(t2)
+    # t1 = t1.astimezone()
+    # print(t1)
+    # # t2 = time_fs('2018-02-01T12:19:39.6337006Z')
+    # # print(t2 - t1)
+    # print(id_to_lower('A2C4B1AD-CE00-469F-9DDE-89AA2A56014B'))
     pass
