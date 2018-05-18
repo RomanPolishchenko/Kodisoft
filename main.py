@@ -95,10 +95,33 @@ def closest_2h(_time):
     return HOUR.seconds < (_time - CURRENT_TIME).seconds <= 2 * HOUR.seconds
 
 
+def analise_order(_order):
+    """
+    Analise order within the time and account its duration and revenue.
+    :param _order: <Order>
+    :return: None
+    """
+    global top_apps_h, top_apps_2h, top_apps_d
+    current_revenue = _order.revenue  # add its revenue
+
+    if closest_h(_order.time):  # if the order is made in closest hour
+        top_apps_h[app_name].total_time += app_duration
+        top_apps_h[app_name].total_revenue += current_revenue
+        # then it's made in closest two hours too
+        top_apps_2h[app_name].total_time += app_duration
+        top_apps_2h[app_name].total_revenue += current_revenue
+    elif closest_2h(_order.time):  # if the order is made in 2 closest hours
+        top_apps_2h[app_name].total_time += app_duration
+        top_apps_2h[app_name].total_revenue += current_revenue
+    top_apps_d[app_name].total_time += app_duration  # anyway it is made in closest day
+    top_apps_d[app_name].total_revenue += current_revenue
+
+
 if __name__ == '__main__':
     # some constants
     CURRENT_TIME = input_time()
     HOUR = datetime.timedelta(0, 3600)
+    N = int(input('Count of top apps: N = '))
 
     # files paths
     apps_path = 'input/apps.csv'
@@ -129,27 +152,21 @@ if __name__ == '__main__':
         if app_session is None or orders.get(app_session) is None:
             continue
         for order in orders.get(app_session):
+            # if order was made in this app
+            if start_time <= order.time <= end_time:
+                analise_order(order)  # than it's probably Restaurant
 
-            if start_time <= order.time <= end_time:  # if order was made in this app
-                current_revenue = order.revenue  # add its revenue
-
-                if closest_h(order.time):  # if the order is made in closest hour
-                    top_apps_h[app_name].total_time += app_duration
-                    top_apps_h[app_name].total_revenue += current_revenue
-                    top_apps_2h[app_name].total_time += app_duration
-                    top_apps_2h[app_name].total_revenue += current_revenue
-                elif closest_2h(order.time):  # if the order is made in 2 closest hours
-                    top_apps_2h[app_name].total_time += app_duration
-                    top_apps_2h[app_name].total_revenue += current_revenue
-                top_apps_d[app_name].total_time += app_duration  # anyway it is made in closest day
-                top_apps_d[app_name].total_revenue += current_revenue
+            # if order was made just before or just after some app
+            if (start_time - order.time).seconds < 60 or (order.time - end_time).seconds < 60:
+                analise_order(order)  # than it's probably an entertaining app
 
     # calculate their efficiency
     calc_efficiency(top_apps_h)
     calc_efficiency(top_apps_2h)
     calc_efficiency(top_apps_d)
 
-    print('top_apps_h: ', top_apps_h)
-    print('top_apps_2h: ', top_apps_2h)
-    print('top_apps_d: ', top_apps_d)
+    # for now just show lists of top apps
+    print('top_apps_h: ', sorted(top_apps_h, key=lambda x: top_apps_h[x].efficiency))
+    print('top_apps_2h: ', sorted(top_apps_2h, key=lambda x: top_apps_2h[x].efficiency))
+    print('top_apps_d: ', sorted(top_apps_d, key=lambda x: top_apps_d[x].efficiency))
     pass
