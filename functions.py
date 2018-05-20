@@ -1,11 +1,16 @@
 import csv
-# from datetime import datetime
-# you should pip install iso8601 before
+
+# you should 'pip install iso8601' before
 from iso8601 import parse_date
 
 
 def read_csv(file_obj):
-
+    """
+    Read info from file that contains information in csv-format.
+    Returns the list of <OrderDict> objects.
+    :param file_obj: file object
+    :return: <list>
+    """
     reader = csv.DictReader(file_obj)
     return list(reader)
 
@@ -31,18 +36,17 @@ def id_to_lower(_id):
 
 
 def benchmark(f):
-    """Декоратор @benchmark для обчислення часу виконання функції f.
-
+    """
+    Decorator for calculating function f working time.
     """
     import time
     import functools
 
     @functools.wraps(f)
-    def _benchmark(*args, **kw):  # функція _benchmark містить код, що виконується
-        # перед та після виклику f
-        t = time.clock()  # вимірюємо час перед викликом функції
-        rez = f(*args, **kw)  # викликаємо f
-        t = time.clock() - t  # вимірюємо різницю у часі після виклику функції
+    def _benchmark(*args, **kw):
+        t = time.clock()  # time before
+        rez = f(*args, **kw)
+        t = time.clock() - t  # time difference
         print('{0} time elapsed {1:.8f}'.format(f.__name__, t))
         return rez
 
@@ -60,13 +64,4 @@ def calc_efficiency(apps):
 
 
 if __name__ == '__main__':
-    t1 = time_fs('2018-02-01T13:08:21.3375025Z')
-    t2 = time_fs('2018-02-01 13:08:21.337')
-    print(t1)
-    print(t2)
-    # t1 = t1.astimezone()
-    # print(t1)
-    # # t2 = time_fs('2018-02-01T12:19:39.6337006Z')
-    # # print(t2 - t1)
-    # print(id_to_lower('A2C4B1AD-CE00-469F-9DDE-89AA2A56014B'))
     pass

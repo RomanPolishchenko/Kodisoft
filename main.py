@@ -131,7 +131,7 @@ def output_result(file_name):
     out_apps_d = sorted([item for item in top_apps_d.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
 
     with open(file_name, 'w', encoding='utf-8') as f:
-        print('Prediction for {}\n'.format(CURRENT_TIME.strftime('hh:mm:ss')), file=f)
+        print('Prediction for {}\n'.format(CURRENT_TIME.strftime('%A, %H:%M')), file=f)
 
         print('Most relevant {} apps in the next hour:'.format(N), file=f)
         for num, _app in enumerate(out_apps_h):
@@ -155,8 +155,6 @@ if __name__ == '__main__':
     SECONDS_BEFORE = 45  # probable time for order be made before app launching
     SECONDS_AFTER = 20  # probable time for order be made after app launching
     N = int(input('Count of top apps: N = '))  # count of top apps
-
-    # t = datetime.datetime.now()  # how much does it work
 
     # files paths
     apps_path = 'input/apps.csv'
@@ -210,5 +208,3 @@ if __name__ == '__main__':
 
     # printing results into the file
     output_result('output.txt')
-    # t = (datetime.datetime.now() - t).seconds  # it worked t seconds
-    # print(t)
