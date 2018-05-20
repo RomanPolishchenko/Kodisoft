@@ -4,7 +4,8 @@ Order = namedtuple('Order', ['revenue', 'time'])
 
 
 class App:
-    def __init__(self, total_time, total_revenue):
+    def __init__(self, name, total_time, total_revenue):
+        self.name = name.rsplit('.', 1)[1]
         self.total_time = total_time
         self.total_revenue = total_revenue
         self.efficiency = 0
@@ -14,4 +15,4 @@ class App:
             self.efficiency = self.total_revenue / self.total_time.seconds
 
     def __repr__(self):
-        return "T: {}, R: {}, E: {}".format(self.total_time, self.total_revenue, self.efficiency)
+        return "T:{}, R:{}, E: {}".format(self.total_time, self.total_revenue, self.efficiency)

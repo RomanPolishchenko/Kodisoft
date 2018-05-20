@@ -70,7 +70,7 @@ def parse_apps(app_list):
     _apps = {}
     for _app in app_list:
         if _app['AppId'] not in _seen:
-            _apps[_app['AppId']] = App(datetime.timedelta(0, 0, 0), 0)
+            _apps[_app['AppId']] = App(_app['AppId'], datetime.timedelta(0, 0, 0), 0)
             _seen.append(_app['AppId'])
     return _apps
 
@@ -117,11 +117,46 @@ def analise_order(_order):
     top_apps_d[app_name].total_revenue += current_revenue
 
 
+def output_result(file_name):
+    """
+    Write the result to the file file_name
+    :param file_name: <str>
+    :return: None
+    """
+    global top_apps_h, top_apps_2h, top_apps_d, N, CURRENT_TIME
+
+    # converting dict to list and sort it by efficiency
+    out_apps_h = sorted([item for item in top_apps_h.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+    out_apps_2h = sorted([item for item in top_apps_2h.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+    out_apps_d = sorted([item for item in top_apps_d.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+
+    with open(file_name, 'w', encoding='utf-8') as f:
+        print('Prediction for {}\n'.format(CURRENT_TIME.strftime('hh:mm:ss')), file=f)
+
+        print('Most relevant {} apps in the next hour:'.format(N), file=f)
+        for num, _app in enumerate(out_apps_h):
+            print('{}. {}'.format(num + 1, _app.name), file=f)
+        print('\n', file=f)
+
+        print('Most relevant {} apps in the next 2 hours:'.format(N), file=f)
+        for num, _app in enumerate(out_apps_2h):
+            print('{}. {}'.format(num + 1, _app.name), file=f)
+        print('\n', file=f)
+
+        print('Most relevant {} apps in the next day:'.format(N), file=f)
+        for num, _app in enumerate(out_apps_d):
+            print('{}. {}'.format(num + 1, _app.name), file=f)
+
+
 if __name__ == '__main__':
     # some constants
-    CURRENT_TIME = input_time()
-    HOUR = datetime.timedelta(0, 3600)
-    N = int(input('Count of top apps: N = '))
+    CURRENT_TIME = input_time()  # current time or set by user
+    HOUR = datetime.timedelta(0, 3600)  # one hour to compare with
+    SECONDS_BEFORE = 45  # probable time for order be made before app launching
+    SECONDS_AFTER = 20  # probable time for order be made after app launching
+    N = int(input('Count of top apps: N = '))  # count of top apps
+
+    # t = datetime.datetime.now()  # how much does it work
 
     # files paths
     apps_path = 'input/apps.csv'
@@ -141,23 +176,31 @@ if __name__ == '__main__':
     top_apps_d = deepcopy(unique_apps)
 
     for app in apps:
+        # current app info
         app_name = app['AppId']
         app_id = app['Id']
         start_time = time_fs(app['StartTime'])
         end_time = time_fs(app['EndTime'])
         app_duration = end_time - start_time
+
+        # if weekday of launching doesn't correspond to current weekday
         if start_time.isoweekday() != CURRENT_TIME.isoweekday():
-            continue
-        app_session = links.get(app_id)
+            continue  # ignoring this launching
+
+        app_session = links.get(app_id)  # get session id in which the order was made
+
+        # if there is no information about session or about order
         if app_session is None or orders.get(app_session) is None:
-            continue
+            continue  # just ignoring this app launching
+
         for order in orders.get(app_session):
-            # if order was made in this app
+            # if the order was made in this app
             if start_time <= order.time <= end_time:
                 analise_order(order)  # than it's probably Restaurant
 
-            # if order was made just before or just after some app
-            if (start_time - order.time).seconds < 60 or (order.time - end_time).seconds < 60:
+            # if the order was made just before or just after some app
+            if (start_time - order.time).seconds < SECONDS_BEFORE or\
+                    (order.time - end_time).seconds < SECONDS_AFTER:
                 analise_order(order)  # than it's probably an entertaining app
 
     # calculate their efficiency
@@ -165,8 +208,7 @@ if __name__ == '__main__':
     calc_efficiency(top_apps_2h)
     calc_efficiency(top_apps_d)
 
-    # for now just show lists of top apps
-    print('top_apps_h: ', sorted(top_apps_h, key=lambda x: top_apps_h[x].efficiency))
-    print('top_apps_2h: ', sorted(top_apps_2h, key=lambda x: top_apps_2h[x].efficiency))
-    print('top_apps_d: ', sorted(top_apps_d, key=lambda x: top_apps_d[x].efficiency))
-    pass
+    # printing results into the file
+    output_result('output.txt')
+    # t = (datetime.datetime.now() - t).seconds  # it worked t seconds
+    # print(t)
