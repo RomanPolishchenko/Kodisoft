@@ -1,7 +1,5 @@
 import csv
-
-# you should 'pip install iso8601' before
-from iso8601 import parse_date
+from modules import iso8601
 
 
 def read_csv(file_obj):
@@ -21,7 +19,7 @@ def time_fs(str_time):
     :param str_time: <class 'str'>. date and time in format '2018-02-21 20:26:37.073'
     :return: <class 'datetime'>.
     """
-    return parse_date(str_time)
+    return iso8601.parse_date(str_time)
 
 
 def id_to_lower(_id):

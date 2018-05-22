@@ -2,6 +2,7 @@ from functions import *
 from classes import *
 import datetime
 from copy import deepcopy
+import os
 
 
 def input_apps(file_path):
@@ -54,7 +55,7 @@ def input_time():
     if _time is '0':
         _time = datetime.datetime.utcnow().astimezone()
     else:
-        _time = parse_date(_time)
+        _time = time_fs(_time)
     return _time
 
 
@@ -131,7 +132,8 @@ def output_result(file_name):
     out_apps_d = sorted([item for item in top_apps_d.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
 
     with open(file_name, 'w', encoding='utf-8') as f:
-        print('Prediction for {}\n'.format(CURRENT_TIME.strftime('%A, %H:%M')), file=f)
+        # print('Prediction for {}\n'.format(CURRENT_TIME.strftime('%A, %H:%M')), file=f)
+        print('Prediction for {}\n'.format(CURRENT_TIME.now().strftime('%A, %H:%M')), file=f)
 
         print('Most relevant {} apps in the next hour:'.format(N), file=f)
         for num, _app in enumerate(out_apps_h):
@@ -147,19 +149,46 @@ def output_result(file_name):
         for num, _app in enumerate(out_apps_d):
             print('{}. {}'.format(num + 1, _app.name), file=f)
 
+    print("Result was also printed to the file 'output.txt' in current directory.")
+
+
+def print_result():
+    global top_apps_h, top_apps_2h, top_apps_d, N, CURRENT_TIME
+
+    # converting dict to list and sort it by efficiency
+    out_apps_h = sorted([item for item in top_apps_h.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+    out_apps_2h = sorted([item for item in top_apps_2h.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+    out_apps_d = sorted([item for item in top_apps_d.values()], key=lambda x: x.efficiency)[:-(N + 1):-1]
+
+    print('Prediction for {}\n'.format(CURRENT_TIME.now().strftime('%A, %H:%M')))
+
+    print('Most relevant {} apps in the next hour:'.format(N))
+    for num, _app in enumerate(out_apps_h):
+        print('{}. {}'.format(num + 1, _app.name))
+    print('\n')
+
+    print('Most relevant {} apps in the next 2 hours:'.format(N))
+    for num, _app in enumerate(out_apps_2h):
+        print('{}. {}'.format(num + 1, _app.name))
+    print('\n')
+
+    print('Most relevant {} apps in the next day:'.format(N))
+    for num, _app in enumerate(out_apps_d):
+        print('{}. {}'.format(num + 1, _app.name))
+
 
 if __name__ == '__main__':
     # some constants
     CURRENT_TIME = input_time()  # current time or set by user
     HOUR = datetime.timedelta(0, 3600)  # one hour to compare with
-    SECONDS_BEFORE = 45  # probable time for order be made before app launching
+    SECONDS_BEFORE = 25  # probable time for order be made before app launching
     SECONDS_AFTER = 20  # probable time for order be made after app launching
     N = int(input('Count of top apps: N = '))  # count of top apps
 
     # files paths
-    apps_path = 'input/apps.csv'
-    links_path = 'input/link_data.csv'
-    orders_path = 'input/orders.csv'
+    apps_path = os.path.join(os.path.dirname(__file__), '.', 'input', 'apps.csv')
+    links_path = os.path.join(os.path.dirname(__file__), '.', 'input', 'link_data.csv')
+    orders_path = os.path.join(os.path.dirname(__file__), '.', 'input', 'orders.csv')
 
     # input info from files and format it
     apps = input_apps(apps_path)
@@ -207,4 +236,7 @@ if __name__ == '__main__':
     calc_efficiency(top_apps_d)
 
     # printing results into the file
-    output_result('output.txt')
+    open('output.txt', 'w', encoding='utf-8').close()
+    output_path = os.path.join(os.path.dirname(__file__), 'output.txt')
+    print_result()
+    output_result(output_path)
