@@ -1,11 +1,11 @@
-Prediction for Tuesday, 13:12
+Prediction for Tuesday, 23:56
 
 Most relevant 8 apps in the next hour:
-1. Restaurant
-2. JigsawPuzzle
-3. PhotoShare
-4. AirHockey
-5. Wallpapers
+1. Wallpapers
+2. PhotoShare
+3. Restaurant
+4. JigsawPuzzle
+5. AirHockey
 6. Paint
 7. Memory
 8. News
@@ -13,11 +13,11 @@ Most relevant 8 apps in the next hour:
 
 Most relevant 8 apps in the next 2 hours:
 1. Restaurant
-2. JigsawPuzzle
-3. PhotoShare
+2. PhotoShare
+3. Wallpapers
 4. AirHockey
-5. Wallpapers
-6. Paint
+5. Paint
+6. JigsawPuzzle
 7. Memory
 8. News
 
