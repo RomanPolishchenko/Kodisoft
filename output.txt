@@ -1,24 +1,33 @@
-Prediction for Tuesday, 11:50
+Prediction for Tuesday, 13:12
 
-Most relevant 5 apps in the next hour:
-1. JigsawPuzzle
-2. PhotoShare
-3. AirHockey
-4. Wallpapers
-5. Paint
-
-
-Most relevant 5 apps in the next 2 hours:
-1. JigsawPuzzle
-2. PhotoShare
-3. AirHockey
-4. Wallpapers
-5. Paint
+Most relevant 8 apps in the next hour:
+1. Restaurant
+2. JigsawPuzzle
+3. PhotoShare
+4. AirHockey
+5. Wallpapers
+6. Paint
+7. Memory
+8. News
 
 
-Most relevant 5 apps in the next day:
-1. Wallpapers
+Most relevant 8 apps in the next 2 hours:
+1. Restaurant
+2. JigsawPuzzle
+3. PhotoShare
+4. AirHockey
+5. Wallpapers
+6. Paint
+7. Memory
+8. News
+
+
+Most relevant 8 apps in the next day:
+1. Restaurant
 2. News
-3. Restaurant
-4. JigsawPuzzle
-5. Paint
+3. PhotoShare
+4. Memory
+5. AirHockey
+6. Paint
+7. Wallpapers
+8. JigsawPuzzle

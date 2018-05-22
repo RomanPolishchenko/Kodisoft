@@ -135,21 +135,21 @@ def output_result(file_name):
         # print('Prediction for {}\n'.format(CURRENT_TIME.strftime('%A, %H:%M')), file=f)
         print('Prediction for {}\n'.format(CURRENT_TIME.now().strftime('%A, %H:%M')), file=f)
 
-        print('Most relevant {} apps in the next hour:'.format(N), file=f)
+        print('Most relevant {} apps in the next hour:'.format(min(N, 8)), file=f)
         for num, _app in enumerate(out_apps_h):
             print('{}. {}'.format(num + 1, _app.name), file=f)
         print('\n', file=f)
 
-        print('Most relevant {} apps in the next 2 hours:'.format(N), file=f)
+        print('Most relevant {} apps in the next 2 hours:'.format(min(N, 8)), file=f)
         for num, _app in enumerate(out_apps_2h):
             print('{}. {}'.format(num + 1, _app.name), file=f)
         print('\n', file=f)
 
-        print('Most relevant {} apps in the next day:'.format(N), file=f)
+        print('Most relevant {} apps in the next day:'.format(min(N, 8)), file=f)
         for num, _app in enumerate(out_apps_d):
             print('{}. {}'.format(num + 1, _app.name), file=f)
 
-    print("Result was also printed to the file 'output.txt' in current directory.")
+    print("Result was also printed to the file 'output.txt' in the current directory.")
 
 
 def print_result():
@@ -162,17 +162,17 @@ def print_result():
 
     print('Prediction for {}\n'.format(CURRENT_TIME.now().strftime('%A, %H:%M')))
 
-    print('Most relevant {} apps in the next hour:'.format(N))
+    print('Most relevant {} apps in the next hour:'.format(min(N, 8)))
     for num, _app in enumerate(out_apps_h):
         print('{}. {}'.format(num + 1, _app.name))
     print('\n')
 
-    print('Most relevant {} apps in the next 2 hours:'.format(N))
+    print('Most relevant {} apps in the next 2 hours:'.format(min(N, 8)))
     for num, _app in enumerate(out_apps_2h):
         print('{}. {}'.format(num + 1, _app.name))
     print('\n')
 
-    print('Most relevant {} apps in the next day:'.format(N))
+    print('Most relevant {} apps in the next day:'.format(min(N, 8)))
     for num, _app in enumerate(out_apps_d):
         print('{}. {}'.format(num + 1, _app.name))
 
@@ -182,8 +182,16 @@ if __name__ == '__main__':
     CURRENT_TIME = input_time()  # current time or set by user
     HOUR = datetime.timedelta(0, 3600)  # one hour to compare with
     SECONDS_BEFORE = 25  # probable time for order be made before app launching
-    SECONDS_AFTER = 20  # probable time for order be made after app launching
+    SECONDS_AFTER = 0  # probable time for order be made after app launching
     N = int(input('Count of top apps: N = '))  # count of top apps
+    # clustering by weekdays and weekends
+    days_of_week = {1: [1, 2, 3, 4, 5],
+                    2: [1, 2, 3, 4, 5],
+                    3: [1, 2, 3, 4, 5],
+                    4: [1, 2, 3, 4, 5],
+                    5: [1, 2, 3, 4, 5],
+                    6: [6, 7],
+                    7: [6, 7]}
 
     # files paths
     apps_path = os.path.join(os.path.dirname(__file__), '.', 'input', 'apps.csv')
@@ -210,8 +218,8 @@ if __name__ == '__main__':
         end_time = time_fs(app['EndTime'])
         app_duration = end_time - start_time
 
-        # if weekday of launching doesn't correspond to current weekday
-        if start_time.isoweekday() != CURRENT_TIME.isoweekday():
+        # check if the day of launching is weekday or weekend
+        if start_time.isoweekday() not in days_of_week[CURRENT_TIME.isoweekday()]:
             continue  # ignoring this launching
 
         app_session = links.get(app_id)  # get session id in which the order was made
